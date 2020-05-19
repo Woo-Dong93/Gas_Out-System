@@ -27,5 +27,5 @@ Arduino IDE Import
 
 ##### 3. 구동영상
 
-<iframe width="640" height="360" src="https://www.youtube.com/embed/6Az2cNU7gUw" frameborder="0" gesture="media" allowfullscreen=""></iframe>
+영상 링크 : https://www.youtube.com/watch?v=zav34Uc1gXY&feature=youtu.be
 
