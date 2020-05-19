@@ -1,0 +1,198 @@
+#include <SoftwareSerial.h>
+#include<Servo.h>
+#include <AFMotor.h>
+const int sensor = A0;
+const int switchPin = 15; 
+const int switch2Pin = 16;
+int blueTx=17;
+int blueRx=18;
+int BuzzerPin = 19;
+
+
+
+
+SoftwareSerial mySerial(blueTx, blueRx);
+
+Servo servo;
+Servo servo1;
+AF_DCMotor m1(1);
+AF_DCMotor m2(2);
+AF_DCMotor m3(3);
+String myString=""; 
+
+int flag = 1;
+int flag1 = 1; //스위치용 플래그
+int flag2 = 1;
+
+void setup()
+{
+  pinMode(BuzzerPin, OUTPUT);
+  pinMode(switchPin,INPUT);
+  
+  pinMode(switch2Pin,INPUT);
+  servo.attach(9); 
+  servo1.attach(10);
+  servo.write(123);
+  servo1.write(123);
+  m1.setSpeed(200);
+  m1.run(RELEASE);
+  m2.setSpeed(200);
+  m2.run(RELEASE);
+  m3.setSpeed(200);
+  m3.run(RELEASE);
+  Serial.begin(9600);
+  mySerial.begin(9600); //블루투스 시리얼 개방
+}
+void loop()
+{
+  Serial.println(analogRead(sensor)); 
+  delay(1000);
+
+
+  while(mySerial.available())  
+  {
+    char myChar = (char)mySerial.read();  
+    myString+=myChar;
+    delay(5);
+  }
+  if(digitalRead(switchPin) == HIGH&&flag1 == 1)
+   {  
+      servo.write(90);
+      servo1.write(150);   
+         
+      flag1 = 0;
+     
+      
+   }
+   else if(digitalRead(switchPin) == LOW&&flag1 == 0 )
+   {
+      servo.write(123);
+      servo1.write(123);
+      flag1 = 1;
+   }
+ 
+  if(analogRead(sensor)>700) 
+  {
+    mySerial.println(analogRead(sensor));  
+  }
+ 
+  
+  if(analogRead(sensor)>700&&flag ==1) 
+  {    
+    servo.write(90);
+    servo1.write(150);
+    m1.run(FORWARD);
+    m2.run(FORWARD);
+    m3.run(FORWARD);
+    digitalWrite(BuzzerPin,HIGH); 
+    
+    flag = 0;    
+    
+    delay(1000);
+    
+    
+  }
+  
+ 
+
+ 
+  
+  else if(analogRead(sensor)<500&&flag==0)
+  {
+    servo.write(125);
+    servo1.write(123);
+    m1.run(RELEASE);
+    m2.run(RELEASE);
+    m3.run(RELEASE);
+    noTone(BuzzerPin);
+    flag = 1;
+    
+    delay(1000);
+  }
+ 
+  
+  if(digitalRead(switch2Pin) == HIGH&&flag2 == 1)
+   {  
+      m1.run(FORWARD);   
+      m2.run(FORWARD); 
+      m3.run(FORWARD); 
+      flag2 = 0;   
+   }
+   else if(digitalRead(switch2Pin) == LOW&&flag2 == 0)
+   {
+      m1.run(RELEASE);
+      m2.run(RELEASE);
+      m3.run(RELEASE);
+      flag2 = 1;
+   }
+   if(!myString.equals(""))  
+   {
+    Serial.println("input value: "+myString); 
+ 
+    if(myString=="Wo1")
+    {
+       servo.write(90);
+    }
+    else if(myString=="Wc1")
+    {
+       servo.write(125);
+    }
+    else if(myString=="Wo2")
+    {
+       servo1.write(150);
+    }
+    else if(myString=="Wc2")
+    {
+       servo1.write(123);
+    }
+   
+    else if(myString=="allo")
+    {
+      servo.write(90);
+      servo1.write(150);
+    }
+    else if(myString=="allc")
+    {
+      servo.write(125);
+      servo1.write(123);
+    }
+    else if(myString=="m1o")
+    {
+      m1.run(FORWARD);
+      m2.run(FORWARD);
+      
+    }
+    else if(myString=="m1c")
+    {
+      m1.run(RELEASE);
+      m2.run(RELEASE);
+      
+    }
+    else if(myString=="m2o")
+    {
+      
+      m3.run(FORWARD);
+      
+    }
+    else if(myString=="m2c")
+    {
+     
+      m3.run(RELEASE);
+      
+    }
+    else if(myString=="allmo")
+    {
+      m1.run(FORWARD);
+      m2.run(FORWARD);
+      m3.run(FORWARD);
+    }
+    else
+    {
+       m1.run(RELEASE);
+       m2.run(RELEASE);
+       m3.run(RELEASE);
+    }
+    myString="";    
+   }
+
+}
